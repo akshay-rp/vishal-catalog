@@ -8,32 +8,26 @@
         * { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #f4f6f9; margin: 0; padding: 0; padding-bottom: 110px; color: #0f172a; }
         
-        /* Modern Glass Header */
         header { background: #2d4059; color: white; padding: 14px 16px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.12); }
         header h1 { margin: 0; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
         header p { margin: 2px 0 0 0; font-size: 12px; opacity: 0.85; font-weight: 500; }
         
-        /* Sticky Controls Header */
         .sticky-top-container { position: sticky; top: 58px; z-index: 90; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .search-bar { padding: 10px 14px 6px 14px; }
         .search-bar input { width: 100%; max-width: 1200px; margin: auto; display: block; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 25px; font-size: 14px; outline: none; background: #ffffff; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
         .search-bar input:focus { border-color: #2563eb; }
 
-        /* Category Filter Pills */
         .category-pills { display: flex; gap: 8px; overflow-x: auto; padding: 6px 14px 10px 14px; scrollbar-width: none; -ms-overflow-style: none; max-width: 1200px; margin: auto; }
         .category-pills::-webkit-scrollbar { display: none; }
         .pill { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; background: #e2e8f0; color: #475569; border: none; cursor: pointer; whitespace: nowrap; transition: all 0.15s ease; flex-shrink: 0; }
         .pill.active { background: #2d4059; color: #ffffff; box-shadow: 0 2px 6px rgba(45,64,89,0.3); }
 
-        /* Product Grid */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; max-width: 1250px; margin: auto; }
         @media (min-width: 768px) {
             .grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; padding: 18px; }
         }
 
-        /* Product Cards */
         .card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; transition: transform 0.15s ease, box-shadow 0.15s ease; position: relative; }
-        .card:active { transform: scale(0.98); }
         
         .img-container { width: 100%; aspect-ratio: 1 / 1; background: #f8fafc; position: relative; overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #f1f5f9; }
         .img-container img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
@@ -44,20 +38,17 @@
         .item-sub { font-size: 12px; color: #64748b; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; whitespace: nowrap; }
         .code-badge { display: inline-block; background: #eff6ff; color: #1d4ed8; font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 12px; margin-bottom: 8px; border: 1px solid #dbeafe; width: fit-content; }
         
-        /* Size Grid */
         .sizes-grid { display: flex; flex-direction: column; gap: 5px; background: #f8fafc; padding: 8px; border-radius: 10px; border: 1px solid #e2e8f0; margin-top: auto; }
         .size-box { display: flex; align-items: center; justify-content: space-between; font-size: 11px; background: #fff; padding: 4px 6px; border: 1px solid #cbd5e1; border-radius: 6px; }
         .stepper { display: flex; align-items: center; gap: 3px; }
-        .stepper button { width: 24px; height: 28px; background: #2d4059; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+        .stepper button { width: 26px; height: 28px; background: #2d4059; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
         .stepper button:active { background: #0f172a; }
-        .stepper input { width: 30px; padding: 3px; text-align: center; border: 1px solid #94a3b8; border-radius: 4px; font-weight: bold; font-size: 12px; outline: none; }
+        .stepper input { width: 34px; padding: 3px; text-align: center; border: 1px solid #94a3b8; border-radius: 4px; font-weight: bold; font-size: 12px; outline: none; }
 
-        /* Floating Cart Bar */
         .bottom-cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #ffffff; border-top: 2px solid #2d4059; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -6px 20px rgba(0,0,0,0.12); z-index: 1000; }
         .cart-info { font-size: 14px; font-weight: 800; color: #0f172a; }
         .btn-checkout { background: #25D366; color: white; border: none; padding: 11px 22px; font-size: 14px; font-weight: bold; border-radius: 30px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(37,211,102,0.4); }
 
-        /* Modals */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
         .modal-content { background: white; padding: 20px; border-radius: 16px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
         .photo-view-modal-content { background: white; padding: 16px; border-radius: 16px; width: 100%; max-width: 720px; max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
@@ -197,9 +188,9 @@
                 <div class="size-box">
                     <span>Size <b>${s.size}</b></span>
                     <div class="stepper">
-                        <button onclick="stepQty('${p.id}', '${s.size}', -1)">-</button>
-                        <input type="number" id="input_${p.id}_${s.size}" class="qty-field-${p.id}-${s.size}" min="0" max="${s.stock}" value="${curQty}" onchange="updateCart('${p.id}', '${s.size}', this.value)">
-                        <button onclick="stepQty('${p.id}', '${s.size}', 1)">+</button>
+                        <button onclick="stepQty('${p.id}', '${s.size}', -1, ${s.stock})">-</button>
+                        <input type="number" id="input_${p.id}_${s.size}" class="qty-field-${p.id}-${s.size}" min="0" max="${s.stock}" value="${curQty}" oninput="manualQtyInput('${p.id}', '${s.size}', this.value, ${s.stock})">
+                        <button onclick="stepQty('${p.id}', '${s.size}', 1, ${s.stock})">+</button>
                     </div>
                 </div>
             `;
@@ -207,34 +198,40 @@
         return html;
     }
 
-    function stepQty(prodId, size, delta) {
-        let inputs = document.querySelectorAll('.qty-field-' + prodId + '-' + size);
-        let curVal = 0;
-        if(inputs.length > 0) curVal = parseInt(inputs[0].value, 10) || 0;
-        
-        let newQty = Math.max(0, curVal + delta);
-        inputs.forEach(inp => inp.value = newQty);
-        updateCart(prodId, size, newQty);
+    function stepQty(prodId, size, delta, maxStock) {
+        let cartKey = prodId + '_' + size;
+        let currentQty = cartState[cartKey] ? cartState[cartKey].qty : 0;
+        let newQty = Math.max(0, currentQty + delta);
+        if (maxStock && newQty > maxStock) newQty = maxStock;
+
+        updateCartStateAndDom(prodId, size, newQty);
     }
 
-    function updateCart(prodId, size, qtyStr) {
-        let q = parseInt(qtyStr, 10) || 0;
+    function manualQtyInput(prodId, size, valueStr, maxStock) {
+        let parsed = parseInt(valueStr, 10) || 0;
+        let newQty = Math.max(0, parsed);
+        if (maxStock && newQty > maxStock) newQty = maxStock;
+
+        updateCartStateAndDom(prodId, size, newQty);
+    }
+
+    function updateCartStateAndDom(prodId, size, qty) {
         let cartKey = prodId + '_' + size;
 
-        let inputs = document.querySelectorAll('.qty-field-' + prodId + '-' + size);
-        inputs.forEach(inp => inp.value = q);
+        let domInputs = document.querySelectorAll('.qty-field-' + prodId + '-' + size);
+        domInputs.forEach(input => { input.value = qty; });
 
-        if (q > 0) {
+        if (qty > 0) {
             let prod = products.find(p => p.id === prodId);
             cartState[cartKey] = {
                 prodId: prodId,
-                hsn: prod.hsn || '',
-                itemNo: prod.itemNo,
-                type: prod.type,
-                colour: prod.colour,
-                code: prod.code || 'N/A',
+                hsn: prod ? (prod.hsn || '') : '',
+                itemNo: prod ? prod.itemNo : '',
+                type: prod ? prod.type : '',
+                colour: prod ? prod.colour : '',
+                code: prod ? (prod.code || 'N/A') : 'N/A',
                 size: size,
-                qty: q
+                qty: qty
             };
         } else {
             delete cartState[cartKey];
