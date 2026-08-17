@@ -50,13 +50,15 @@
         .btn-checkout { background: #25D366; color: white; border: none; padding: 11px 22px; font-size: 14px; font-weight: bold; border-radius: 30px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(37,211,102,0.4); }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
-        .modal-content { background: white; padding: 20px; border-radius: 16px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+        .modal-content { background: white; padding: 20px; border-radius: 16px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
         .photo-view-modal-content { background: white; padding: 16px; border-radius: 16px; width: 100%; max-width: 720px; max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         .photo-preview-box { width: 100%; max-height: 50vh; background: #0f172a; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .photo-preview-box img { max-width: 100%; max-height: 50vh; object-fit: contain; }
-        table.order-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-        table.order-table th, table.order-table td { border: 1px solid #cbd5e1; padding: 7px; text-align: left; }
-        table.order-table th { background: #f1f5f9; font-weight: bold; }
+        
+        /* Matrix Order Table output like POS billing */
+        table.order-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+        table.order-table th, table.order-table td { border: 1px solid #cbd5e1; padding: 6px 8px; text-align: center; }
+        table.order-table th { background: #f1f5f9; font-weight: bold; color: #2d4059; }
     </style>
 </head>
 <body>
@@ -99,8 +101,8 @@
             <input type="text" id="buyerPhone" placeholder="Mobile Number" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; outline:none;">
         </div>
         
-        <h4 style="margin-top:18px; margin-bottom:6px; color:#2d4059;">Line-Wise Order Summary</h4>
-        <div id="orderTableContainer"></div>
+        <h4 style="margin-top:18px; margin-bottom:6px; color:#2d4059;">Estimate-Style Order Output Form</h4>
+        <div id="orderTableContainer" style="overflow-x:auto;"></div>
 
         <div style="margin-top:22px; display:flex; gap:10px; justify-content:flex-end;">
             <button type="button" onclick="closeOrderModal()" style="padding:10px 18px; background:#94a3b8; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Cancel</button>
@@ -155,7 +157,6 @@
         }
 
         items.forEach(p => {
-            let safeProdId = cleanId(p.id);
             let photoTag = p.photo ? 
                 `<div class="img-container" onclick="openPhotoModal('${p.id}')">
                     <img src="${p.photo}" alt="${p.itemNo}">
@@ -298,40 +299,87 @@
             return;
         }
 
+        let itemsList = Object.values(cartState);
+        let groupMap = {};
+        let sizesSet = new Set();
+
+        itemsList.forEach(item => {
+            let groupKey = `${item.hsn}_${item.itemNo.toLowerCase()}_${item.type.toLowerCase()}_${item.colour.toLowerCase()}_${item.code}`;
+            if (!groupMap[groupKey]) {
+                groupMap[groupKey] = {
+                    hsn: item.hsn || '-',
+                    itemNo: item.itemNo,
+                    type: item.type,
+                    colour: item.colour,
+                    code: item.code,
+                    sizesMap: {},
+                    totalQty: 0
+                };
+            }
+            sizesSet.add(item.size);
+            groupMap[groupKey].sizesMap[item.size] = (groupMap[groupKey].sizesMap[item.size] || 0) + item.qty;
+            groupMap[groupKey].totalQty += item.qty;
+        });
+
+        let sizesList = Array.from(sizesSet).sort((a, b) => {
+            let na = parseFloat(a), nb = parseFloat(b);
+            if (!isNaN(na) && !isNaN(nb)) return na - nb;
+            return a.localeCompare(b);
+        });
+
+        let groups = Object.values(groupMap);
+
         let tableHtml = `
             <table class="order-table">
                 <thead>
                     <tr>
-                        <th style="width:30px;">SL</th>
-                        <th>10-Digit Code</th>
-                        <th>Item No / Type</th>
+                        <th style="width:25px;">SL</th>
+                        <th>HSN</th>
+                        <th>Item Description</th>
                         <th>Colour</th>
-                        <th>Size</th>
-                        <th style="text-align:right;">Qty</th>
+        `;
+
+        sizesList.forEach(s => {
+            tableHtml += `<th style="width:30px;">${s}</th>`;
+        });
+
+        tableHtml += `
+                        <th>Tot Qty</th>
+                        <th>10-Digit Code</th>
                     </tr>
                 </thead>
                 <tbody>
         `;
 
-        let totalQty = 0;
-        Object.values(cartState).forEach((i, idx) => {
-            totalQty += i.qty;
+        let grandQty = 0;
+
+        groups.forEach((g, idx) => {
+            grandQty += g.totalQty;
             tableHtml += `
                 <tr>
                     <td>${idx + 1}</td>
-                    <td><b>${i.code}</b></td>
-                    <td>${i.itemNo} ${i.type}</td>
-                    <td>${i.colour}</td>
-                    <td><b>${i.size}</b></td>
-                    <td style="text-align:right; font-weight:bold;">${i.qty}</td>
+                    <td>${g.hsn}</td>
+                    <td style="text-align:left;"><b>${g.itemNo}</b> ${g.type}</td>
+                    <td>${g.colour}</td>
+            `;
+
+            sizesList.forEach(s => {
+                let q = g.sizesMap[s] || '';
+                tableHtml += `<td><b>${q}</b></td>`;
+            });
+
+            tableHtml += `
+                    <td><b>${g.totalQty}</b></td>
+                    <td><b>${g.code}</b></td>
                 </tr>
             `;
         });
 
         tableHtml += `
                 <tr style="background:#f1f5f9; font-weight:bold;">
-                    <td colspan="5" style="text-align:right;">Total Quantity:</td>
-                    <td style="text-align:right; color:#0369a1;">${totalQty} pcs</td>
+                    <td colspan="${4 + sizesList.length}" style="text-align:right;">Grand Total Quantity:</td>
+                    <td style="color:#0369a1;">${grandQty} pcs</td>
+                    <td>-</td>
                 </tr>
             </tbody>
             </table>
@@ -355,7 +403,37 @@
             return;
         }
 
-        let message = `*DIGITAL CATALOG ORDER FORM*
+        let itemsList = Object.values(cartState);
+        let groupMap = {};
+        let sizesSet = new Set();
+
+        itemsList.forEach(item => {
+            let groupKey = `${item.hsn}_${item.itemNo.toLowerCase()}_${item.type.toLowerCase()}_${item.colour.toLowerCase()}_${item.code}`;
+            if (!groupMap[groupKey]) {
+                groupMap[groupKey] = {
+                    hsn: item.hsn || '-',
+                    itemNo: item.itemNo,
+                    type: item.type,
+                    colour: item.colour,
+                    code: item.code,
+                    sizesMap: {},
+                    totalQty: 0
+                };
+            }
+            sizesSet.add(item.size);
+            groupMap[groupKey].sizesMap[item.size] = (groupMap[groupKey].sizesMap[item.size] || 0) + item.qty;
+            groupMap[groupKey].totalQty += item.qty;
+        });
+
+        let sizesList = Array.from(sizesSet).sort((a, b) => {
+            let na = parseFloat(a), nb = parseFloat(b);
+            if (!isNaN(na) && !isNaN(nb)) return na - nb;
+            return a.localeCompare(b);
+        });
+
+        let groups = Object.values(groupMap);
+
+        let message = `*DIGITAL CATALOG ESTIMATE-STYLE ORDER FORM*
 
 `;
         message += `*Party Name:* ${name}
@@ -366,24 +444,34 @@
 `;
         message += `-----------------------------------
 `;
-        message += `*LINE-WISE ITEM ORDER LIST:*
+        message += `*ITEM-WISE MATRIX ORDER BREAKDOWN:*
 
 `;
 
-        let totalQty = 0;
+        let grandQty = 0;
 
-        Object.values(cartState).forEach((i, idx) => {
-            message += `*${idx + 1}. Code: ${i.code}*
-   Item: ${i.itemNo} (${i.type})
-   Colour: ${i.colour} | Size: *${i.size}* | Qty: *${i.qty} pcs*
+        groups.forEach((g, idx) => {
+            grandQty += g.totalQty;
+            let sizeBreakdownStr = sizesList.map(s => `Size ${s}: ${g.sizesMap[s] || 0} pcs`).filter(str => !str.endsWith(': 0 pcs')).join(' | ');
+
+            message += `*${idx + 1}. ${g.itemNo} ${g.type}*
+`;
+            if (g.hsn && g.hsn !== '-') message += `   HSN: ${g.hsn}
+`;
+            message += `   Colour: ${g.colour}
+`;
+            message += `   Sizes: *${sizeBreakdownStr}*
+`;
+            message += `   Line Total: *${g.totalQty} pcs*
+`;
+            message += `   10-Digit Code: *${g.code}*
 
 `;
-            totalQty += i.qty;
         });
 
         message += `-----------------------------------
 `;
-        message += `*TOTAL QUANTITY:* *${totalQty} pcs*
+        message += `*GRAND TOTAL QUANTITY:* *${grandQty} pcs*
 `;
 
         let encodedMsg = encodeURIComponent(message);
