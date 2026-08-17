@@ -72,8 +72,8 @@
     </div>
 
     <div class="category-pills" id="categoryPills">
-        <button class="pill active" onclick="selectCategory('ALL', this)">All Items</button>
-        <button class="pill" onclick="selectCategory('COAT SUIT 4 PCS', this)">COAT SUIT 4 PCS</button><button class="pill" onclick="selectCategory('JODHPURI 2 PCS', this)">JODHPURI 2 PCS</button><button class="pill" onclick="selectCategory('N/A', this)">N/A</button>
+        <button type="button" class="pill active" onclick="selectCategory('ALL', this)">All Items</button>
+        <button type="button" class="pill" onclick="selectCategory('COAT SUIT 4 PCS', this)">COAT SUIT 4 PCS</button><button type="button" class="pill" onclick="selectCategory('JODHPURI 2 PCS', this)">JODHPURI 2 PCS</button><button type="button" class="pill" onclick="selectCategory('N/A', this)">N/A</button>
     </div>
 </div>
 
@@ -83,7 +83,7 @@
     <div class="cart-info">
         Selected: <span id="cartCount" style="color: #2563eb;">0 pcs</span> (<span id="lineItemCount">0 items</span>)
     </div>
-    <button class="btn-checkout" onclick="openOrderModal()">💬 Submit Order via WhatsApp</button>
+    <button type="button" class="btn-checkout" onclick="openOrderModal()">💬 Submit Order via WhatsApp</button>
 </div>
 
 <!-- Order Modal -->
@@ -103,8 +103,8 @@
         <div id="orderTableContainer"></div>
 
         <div style="margin-top:22px; display:flex; gap:10px; justify-content:flex-end;">
-            <button onclick="closeOrderModal()" style="padding:10px 18px; background:#94a3b8; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Cancel</button>
-            <button onclick="sendWhatsAppOrder()" style="padding:10px 20px; background:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Send via WhatsApp</button>
+            <button type="button" onclick="closeOrderModal()" style="padding:10px 18px; background:#94a3b8; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Cancel</button>
+            <button type="button" onclick="sendWhatsAppOrder()" style="padding:10px 20px; background:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Send via WhatsApp</button>
         </div>
     </div>
 </div>
@@ -123,7 +123,7 @@
             <div id="modalSizesGrid" class="sizes-grid"></div>
         </div>
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px; border-top:1px solid #e2e8f0; padding-top:12px;">
-            <button onclick="closePhotoModal()" style="padding:10px 20px; background:#2d4059; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Done</button>
+            <button type="button" onclick="closePhotoModal()" style="padding:10px 20px; background:#2d4059; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Done</button>
         </div>
     </div>
 </div>
@@ -133,6 +133,10 @@
     const WHATSAPP_NUMBER = "918660057253";
     let cartState = {};
     let selectedCat = 'ALL';
+
+    function cleanId(rawId) {
+        return String(rawId).replace(/[^a-zA-Z0-9]/g, '');
+    }
 
     function selectCategory(cat, btnElem) {
         selectedCat = cat;
@@ -151,6 +155,7 @@
         }
 
         items.forEach(p => {
+            let safeProdId = cleanId(p.id);
             let photoTag = p.photo ? 
                 `<div class="img-container" onclick="openPhotoModal('${p.id}')">
                     <img src="${p.photo}" alt="${p.itemNo}">
@@ -180,17 +185,20 @@
 
     function renderSizeBoxesHtml(p) {
         let html = '';
+        let safeProdId = cleanId(p.id);
+
         p.sizes.forEach(s => {
-            let cartKey = p.id + '_' + s.size;
+            let safeSize = cleanId(s.size);
+            let cartKey = safeProdId + '_' + safeSize;
             let curQty = cartState[cartKey] ? cartState[cartKey].qty : 0;
 
             html += `
                 <div class="size-box">
                     <span>Size <b>${s.size}</b></span>
                     <div class="stepper">
-                        <button onclick="stepQty('${p.id}', '${s.size}', -1, ${s.stock})">-</button>
-                        <input type="number" id="input_${p.id}_${s.size}" class="qty-field-${p.id}-${s.size}" min="0" max="${s.stock}" value="${curQty}" oninput="manualQtyInput('${p.id}', '${s.size}', this.value, ${s.stock})">
-                        <button onclick="stepQty('${p.id}', '${s.size}', 1, ${s.stock})">+</button>
+                        <button type="button" onclick="stepQty('${p.id}', '${s.size}', -1, ${s.stock})">-</button>
+                        <input type="number" class="qty-field-${safeProdId}-${safeSize}" min="0" max="${s.stock}" value="${curQty}" oninput="manualQtyInput('${p.id}', '${s.size}', this.value, ${s.stock})">
+                        <button type="button" onclick="stepQty('${p.id}', '${s.size}', 1, ${s.stock})">+</button>
                     </div>
                 </div>
             `;
@@ -199,7 +207,9 @@
     }
 
     function stepQty(prodId, size, delta, maxStock) {
-        let cartKey = prodId + '_' + size;
+        let safeProdId = cleanId(prodId);
+        let safeSize = cleanId(size);
+        let cartKey = safeProdId + '_' + safeSize;
         let currentQty = cartState[cartKey] ? cartState[cartKey].qty : 0;
         let newQty = Math.max(0, currentQty + delta);
         if (maxStock && newQty > maxStock) newQty = maxStock;
@@ -216,9 +226,11 @@
     }
 
     function updateCartStateAndDom(prodId, size, qty) {
-        let cartKey = prodId + '_' + size;
+        let safeProdId = cleanId(prodId);
+        let safeSize = cleanId(size);
+        let cartKey = safeProdId + '_' + safeSize;
 
-        let domInputs = document.querySelectorAll('.qty-field-' + prodId + '-' + size);
+        let domInputs = document.querySelectorAll('.qty-field-' + safeProdId + '-' + safeSize);
         domInputs.forEach(input => { input.value = qty; });
 
         if (qty > 0) {
@@ -374,8 +386,12 @@
         message += `*TOTAL QUANTITY:* *${totalQty} pcs*
 `;
 
-        let url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-        window.open(url, '_blank');
+        let encodedMsg = encodeURIComponent(message);
+        let webUrl = `https://web.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMsg}`;
+        let mobileUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMsg}`;
+
+        let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        window.open(isMobile ? mobileUrl : webUrl, '_blank');
         closeOrderModal();
     }
 
